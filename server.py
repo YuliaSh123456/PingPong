@@ -6,17 +6,14 @@ def main():
     serv.bind(('localhost', 50000))
     serv.listen(5)
     conn, addr = serv.accept()
-    from_client = ''
     data = "Start"
     while data != "":
         data = conn.recv(4096)
-        if not data:
-            break
-        from_client += data
-        print from_client
-        conn.send(from_client + from_client)
+        print data
+        conn.send(data + data)
     conn.close()
     print 'client disconnected'
+    serv.close()
 
 
 if __name__ == "__main__":
