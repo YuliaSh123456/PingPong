@@ -7,7 +7,7 @@ def main():
 
     data_to_send = ""
 
-    while (data_to_send is not "q"):
+    while data_to_send != "q":
         data_to_send = raw_input()
         client.send(data_to_send)
         from_srvr = client.recv(4096)
