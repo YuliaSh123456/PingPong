@@ -14,9 +14,6 @@ def main():
         from_srvr = client.recv(4096)
         print from_srvr
 
-    client.send("SHUTDOWN")
-    from_srvr = client.recv(4096)
-    print 'Last msg {}'.format(from_srvr)
     client.shutdown(socket.SHUT_RDWR)
     client.close()
     print "Good bye... "
