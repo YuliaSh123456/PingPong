@@ -15,8 +15,10 @@ def main():
             except socket.error, e:
                 print "Client aborted "+str(e)
                 break
-            print data
-            conn.send(data + data)
+
+            if data != "":
+                print data
+                conn.send(data + data)
 
         conn.close()
         print 'client disconnected'
