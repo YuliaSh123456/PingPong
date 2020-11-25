@@ -12,8 +12,8 @@ def main():
         while data != "":
             try:
                 data = conn.recv(4096)
-            except:
-                print "Client aborted"
+            except socket.error, e:
+                print "Client aborted "+str(e)
                 break
             if data == "SHUTDOWN":
                 conn.sendall("GOODBYE")
