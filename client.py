@@ -7,12 +7,16 @@ def main():
 
     data_to_send = ""
 
-    while data_to_send != "q":
+    print "Insert message: "
+    while data_to_send != "Exit":
         data_to_send = raw_input()
         client.send(data_to_send)
         from_srvr = client.recv(4096)
         print from_srvr
+
+    client.shutdown(socket.SHUT_RDWR)
     client.close()
+    print "Good bye... "
 
 
 if __name__ == "__main__":
