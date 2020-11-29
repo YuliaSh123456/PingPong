@@ -3,13 +3,12 @@ import select, socket, sys, Queue
 inputs = []
 outputs = []
 message_queues = {}
-data_to_send = 0
 
 def add_new_client(new_socket):
     connection, client_address = new_socket.accept()
     connection.setblocking(0)
     inputs.append(connection)
-    message_queues[connection] = 0 
+    message_queues[connection] = 0
 
 
 def handle_client_input(socket_to_read):
@@ -17,13 +16,7 @@ def handle_client_input(socket_to_read):
         data = socket_to_read.recv(1024)
     except socket.error, e:
         print "Client aborted " + str(e)
-
-        if socket_to_read in outputs:
-            outputs.remove(socket_to_read)
-
-        inputs.remove(socket_to_read)
-        socket_to_read.close()
-        message_queues[socket_to_read] = 0
+        handle_clients_removal(socket_to_read)
         return False
 
     if data:
@@ -32,10 +25,7 @@ def handle_client_input(socket_to_read):
         if socket_to_read not in outputs:
             outputs.append(socket_to_read)
     else:
-        if socket_to_read in outputs:
-            outputs.remove(socket_to_read)
-        inputs.remove(socket_to_read)
-        socket_to_read.close()
+        handle_clients_removal(socket_to_read)
 
     return True
 
@@ -44,12 +34,23 @@ def handle_client_output(socket_to_write):
 
     if message_queues[socket_to_write] == 0:
         return
-
     try:
         socket_to_write.send(message_queues[socket_to_write])
         message_queues[socket_to_write] = 0
     except socket.error, e:
         print "Client aborted " + str(e)
+
+def handle_clients_removal(socket_to_remove):
+
+    message_queues[socket_to_remove] = 0
+
+    if socket_to_remove in outputs:
+        outputs.remove(socket_to_remove)
+
+    if socket_to_remove in inputs:
+        inputs.remove(socket_to_remove)
+
+    socket_to_remove.close()
 
 
 def main():
@@ -74,11 +75,7 @@ def main():
             handle_client_output(s)
 
         for s in exceptional:
-            inputs.remove(s)
-            if s in outputs:
-                outputs.remove(s)
-            s.close()
-            message_queues[s] = 0
+            handle_clients_removal(s)
 
     server.close()
 
