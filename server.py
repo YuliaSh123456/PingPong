@@ -9,7 +9,7 @@ def add_new_client(new_socket):
     connection, client_address = new_socket.accept()
     connection.setblocking(0)
     inputs.append(connection)
-    #message_queues[connection] = Queue.Queue()
+    message_queues[connection] = 0 
 
 
 def handle_client_input(socket_to_read):
@@ -23,12 +23,12 @@ def handle_client_input(socket_to_read):
 
         inputs.remove(socket_to_read)
         socket_to_read.close()
-        #del message_queues[socket_to_read]
+        message_queues[socket_to_read] = 0
         return False
 
     if data:
-        global data_to_send
-        data_to_send = data + data
+
+        message_queues[socket_to_read] = data + data
         if socket_to_read not in outputs:
             outputs.append(socket_to_read)
     else:
@@ -36,19 +36,18 @@ def handle_client_input(socket_to_read):
             outputs.remove(socket_to_read)
         inputs.remove(socket_to_read)
         socket_to_read.close()
-        #del message_queues[socket_to_read]
 
     return True
 
 
 def handle_client_output(socket_to_write):
-    global data_to_send
-    if data_to_send == 0:
+
+    if message_queues[socket_to_write] == 0:
         return
 
     try:
-        socket_to_write.send(data_to_send)
-        data_to_send = 0
+        socket_to_write.send(message_queues[socket_to_write])
+        message_queues[socket_to_write] = 0
     except socket.error, e:
         print "Client aborted " + str(e)
 
@@ -79,8 +78,9 @@ def main():
             if s in outputs:
                 outputs.remove(s)
             s.close()
-            #del message_queues[s]
+            message_queues[s] = 0
 
+    server.close()
 
 if __name__ == "__main__":
     main()
