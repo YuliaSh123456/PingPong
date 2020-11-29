@@ -11,7 +11,7 @@ def main():
     while data_to_send != "Exit":
         data_to_send = raw_input()
         client.send(data_to_send)
-        from_srvr = client.recv(4096)
+        from_srvr = client.recv(1024)
         print from_srvr
 
     client.shutdown(socket.SHUT_RDWR)
